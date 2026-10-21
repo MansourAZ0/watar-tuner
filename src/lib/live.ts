@@ -111,7 +111,9 @@ export function useLive<T>(
 export function shallowEqual<T extends object | null>(a: T, b: T): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
-  const ka = Object.keys(a) as (keyof T)[];
-  if (ka.length !== Object.keys(b).length) return false;
-  return ka.every((k) => Object.is(a[k], b[k]));
+  const ra = a as Record<string, unknown>;
+  const rb = b as Record<string, unknown>;
+  const ka = Object.keys(ra);
+  if (ka.length !== Object.keys(rb).length) return false;
+  return ka.every((k) => Object.is(ra[k], rb[k]));
 }

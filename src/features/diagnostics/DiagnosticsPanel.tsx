@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { StringKey } from "../../lib/i18n";
-import { shallowEqual, useLive } from "../../lib/live";
+import { shallowEqual } from "@naghma/ui";
+import { useFrame } from "../../lib/live";
 import type { AudioStatus } from "../../lib/types";
 
 type T = (k: StringKey) => string;
@@ -24,7 +25,7 @@ export function DiagnosticsPanel({ t }: { t: T }) {
     };
   }, []);
 
-  const d = useLive(
+  const d = useFrame(
     (f) => ({
       rawHz: f.diagnostics.rawHz,
       computeUs: f.diagnostics.computeUs,

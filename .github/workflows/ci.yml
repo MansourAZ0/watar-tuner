@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
+      - name: Fetch naghma-core (for @naghma/ui)
+        run: git clone --depth 1 --branch v0.2.0 "https://x-access-token:${{ secrets.DEPS_TOKEN || github.token }}@github.com/MansourAZ0/naghma-core" ../naghma-core
       - uses: actions/setup-node@v4
         with:
           node-version: 22

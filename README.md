@@ -36,7 +36,10 @@ libraries:
 
 ## Development
 
-Prerequisites: Rust ≥ 1.90, Node ≥ 20, and the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
+Prerequisites: Rust ≥ 1.90, Node ≥ 20, the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/),
+and a checkout of [naghma-core](https://github.com/MansourAZ0/naghma-core)
+next to this repository (the shared `@naghma/ui` package is a path
+dependency: `../naghma-core/packages/naghma-ui`).
 
 ```sh
 npm install

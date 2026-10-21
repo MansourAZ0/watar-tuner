@@ -2,17 +2,9 @@
 // Field names follow the Rust `#[serde(rename_all = "camelCase")]` output;
 // `src-tauri/src/frame.rs` has a test pinning the frame contract.
 
-export type Degree = "do" | "re" | "mi" | "fa" | "sol" | "la" | "si";
+import type { AccidentalStyle, NoteLabel, NoteView, Script, Transposition } from "@naghma/ui";
 
-export interface NoteLabel {
-  text: string;
-  name: string;
-  accidental: string;
-  octave: string;
-  degree: Degree;
-  accidentalQuarterTones: number;
-  octaveNumber: number;
-}
+export type { AccidentalStyle, Degree, IntervalUnit, NoteLabel, NoteView, Script, Transposition } from "@naghma/ui";
 
 export type UiState = "silent" | "listening" | "note";
 export type ObservationStatus = "voiced" | "silence" | "aperiodic" | "outOfRange";
@@ -115,17 +107,7 @@ export interface InstrumentInfo {
   courses: CourseInfo[];
 }
 
-export type IntervalUnit = "semitone" | "wholeTone" | "quarterTone" | "cent";
-
-export interface Transposition {
-  amount: number;
-  unit: IntervalUnit;
-}
-
 export type Language = "en" | "ar";
-export type Script = "latin" | "arabic";
-export type AccidentalStyle = "symbol" | "words";
-export type NoteView = "player" | "concert";
 export type TuningChoice = "edo24" | "edo12";
 export type VisualQuality = "full" | "reduced" | "off";
 

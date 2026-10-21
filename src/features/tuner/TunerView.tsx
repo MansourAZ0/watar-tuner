@@ -1,9 +1,7 @@
-import { NoteName } from "../../components/NoteName";
+import { CentsMeter, NoteName, formatCents, formatHz, shallowEqual, tuningZone } from "@naghma/ui";
 import type { StringKey } from "../../lib/i18n";
-import { shallowEqual, useLive } from "../../lib/live";
-import { formatCents, formatHz, tuningZone } from "../../lib/tuning";
+import { heldCents, useFrame } from "../../lib/live";
 import type { InstrumentInfo, NoteLabel, NoteView, Settings, UiFrame } from "../../lib/types";
-import { CentsMeter } from "./CentsMeter";
 import { NoteHistory } from "./NoteHistory";
 
 type T = (k: StringKey) => string;
@@ -19,7 +17,7 @@ const heroEqual = (a: HeroState, b: HeroState) =>
   a.state === b.state && a.holding === b.holding && a.label?.text === b.label?.text && a.other?.text === b.other?.text;
 
 function useHero(): HeroState {
-  return useLive<HeroState>(
+  return useFrame<HeroState>(
     (f) => ({
       state: f.state,
       label: f.note?.label ?? null,
@@ -41,7 +39,7 @@ interface Readout {
 
 function useReadout(): Readout {
   // Numbers update at 12 Hz: fast enough to follow, slow enough to read.
-  return useLive<Readout>(
+  return useFrame<Readout>(
     (f) => ({
       cents: f.note ? Math.round(f.note.cents) : null,
       hz: f.note ? Math.round(f.note.hz * 10) / 10 : null,
@@ -125,7 +123,7 @@ export function TunerView({
       </section>
 
       <div className="meter-wrap">
-        <CentsMeter flatLabel={t("flat")} sharpLabel={t("sharp")} />
+        <CentsMeter read={heldCents} flatLabel={t("flat")} sharpLabel={t("sharp")} />
         <div className={`cents-readout zone-${zone ?? "none"}`}>
           <span className="ltr">{readout.cents === null ? "–" : formatCents(readout.cents)}</span>
           <span className="unit">{t("cents")}</span>

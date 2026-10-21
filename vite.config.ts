@@ -7,6 +7,8 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [react()],
+  // @naghma/ui is a symlinked local package; make sure it uses the app's React.
+  resolve: { dedupe: ["react", "react-dom"] },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

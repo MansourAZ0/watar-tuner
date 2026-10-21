@@ -10,8 +10,8 @@
 //   confidence      → particle opacity
 // No pre-rendered or looping animation is used.
 
-import type { LiveStore } from "../../lib/live";
-import { direction, levelIntensity, pitchHue, tuningZone } from "../../lib/tuning";
+import { direction, levelIntensity, pitchHue, tuningZone } from "@naghma/ui";
+import type { WatarStore } from "../../lib/live";
 import type { VisualQuality } from "../../lib/types";
 
 interface Ring {
@@ -55,7 +55,7 @@ export class VisualEngine {
 
   constructor(
     private canvas: HTMLCanvasElement,
-    private store: LiveStore,
+    private store: WatarStore,
     private quality: VisualQuality,
   ) {
     const ctx = canvas.getContext("2d");

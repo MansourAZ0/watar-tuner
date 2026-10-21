@@ -1,6 +1,5 @@
-import { NoteName } from "../../components/NoteName";
-import { live, useLive } from "../../lib/live";
-import { direction } from "../../lib/tuning";
+import { NoteName, direction } from "@naghma/ui";
+import { live, useFrame } from "../../lib/live";
 import type { AccidentalStyle } from "../../lib/types";
 
 const SHOWN = 12;
@@ -8,7 +7,7 @@ const SHOWN = 12;
 /** Trail of recently started notes with melodic direction. */
 export function NoteHistory({ title, accidentalStyle }: { title: string; accidentalStyle: AccidentalStyle }) {
   // Re-render only when a new note starts.
-  useLive((f) => f.started?.eventId ?? null, (a, b) => b === null || a === b, 30);
+  useFrame((f) => f.started?.eventId ?? null, (a, b) => b === null || a === b, 30);
   const items = live.history.slice(-SHOWN);
   if (items.length === 0) return null;
   return (

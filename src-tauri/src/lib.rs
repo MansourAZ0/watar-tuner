@@ -111,12 +111,11 @@ async fn update_settings(
     settings
         .validate()
         .map_err(|e| CommandError::new("invalidSettings", e))?;
-    let old = state.settings.lock().expect("settings lock").clone();
     settings
         .save(&state.settings_path)
         .map_err(|e| CommandError::new("io", e))?;
     *state.settings.lock().expect("settings lock") = settings.clone();
-    state.audio.apply(&old, &settings)?;
+    state.audio.apply(&settings)?;
     Ok(settings)
 }
 

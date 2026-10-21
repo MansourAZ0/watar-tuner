@@ -1,10 +1,12 @@
-//! Owns the running analysis engine and forwards frames to the UI.
+//! Watar's audio glue: builds engine configurations from settings and maps
+//! engine events to UI messages. Engine ownership, live reconfiguration and
+//! restarts are handled by `naghma_audio::EngineSession`.
 
 use crate::frame::{Presentation, UiFrame};
 use crate::settings::Settings;
 use naghma_audio::simulation::SimulationSpec;
 use naghma_audio::{
-    Engine, EngineConfig, EngineError, EngineEvent, EngineStats, SourceConfig, StreamInfo,
+    EngineConfig, EngineError, EngineEvent, EngineSession, EngineStats, SourceConfig, StreamInfo,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex, RwLock};
@@ -19,7 +21,7 @@ pub enum SourceMode {
     Simulation,
 }
 
-/// Messages on the UI channel besides frames.
+/// Messages on the UI channel.
 // Frames are nearly every message; boxing them would allocate per hop.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
@@ -29,109 +31,81 @@ pub enum UiMessage {
     Error { error: EngineError, message: String },
 }
 
-struct Running {
-    engine: Engine,
-    mode: SourceMode,
-    channel: Channel<UiMessage>,
-}
-
-/// Thread-safe holder for the engine.
+/// Thread-safe audio state for the Tauri app.
 #[derive(Default)]
 pub struct AudioController {
-    running: Mutex<Option<Running>>,
+    session: EngineSession,
+    mode: Mutex<Option<SourceMode>>,
     presentation: Arc<RwLock<Option<Presentation>>>,
 }
 
+fn engine_config(mode: SourceMode, settings: &Settings) -> EngineConfig {
+    EngineConfig {
+        source: match mode {
+            SourceMode::Microphone => SourceConfig::Microphone {
+                device_id: settings.input_device_id.clone(),
+            },
+            SourceMode::Simulation => SourceConfig::Simulation(SimulationSpec::default()),
+        },
+        analysis: settings.analysis_config(),
+        tracker: settings.tracker_config(),
+        context: settings.pitch_context(),
+    }
+}
+
 impl AudioController {
-    /// Start (or restart) the engine with `settings`, sending frames to
-    /// `channel`. Blocks while the OS opens the device (possibly showing a
-    /// permission prompt) — call from a blocking-capable thread.
+    /// Start (or restart) with `settings`, sending messages to `channel`.
+    /// Blocks while the OS opens the device — call off the async runtime.
     pub fn start(
         &self,
         mode: SourceMode,
         settings: &Settings,
         channel: Channel<UiMessage>,
     ) -> Result<StreamInfo, EngineError> {
-        self.stop();
         self.set_presentation(settings);
-        let source = match mode {
-            SourceMode::Microphone => SourceConfig::Microphone {
-                device_id: settings.input_device_id.clone(),
-            },
-            SourceMode::Simulation => SourceConfig::Simulation(SimulationSpec::default()),
-        };
-        let config = EngineConfig {
-            source,
-            analysis: settings.analysis_config(),
-            tracker: settings.tracker_config(),
-            context: settings.pitch_context(),
-        };
         let presentation = self.presentation.clone();
-        let tx = channel.clone();
-        let engine = Engine::start(config, move |event| match event {
-            EngineEvent::Frame(f) => {
-                let frame = presentation
-                    .read()
-                    .ok()
-                    .and_then(|p| p.as_ref().map(|p| p.frame(&f)));
-                if let Some(frame) = frame {
-                    let _ = tx.send(UiMessage::Frame(frame));
+        let info = self
+            .session
+            .start(engine_config(mode, settings), move |event| match event {
+                EngineEvent::Frame(f) => {
+                    let frame = presentation
+                        .read()
+                        .ok()
+                        .and_then(|p| p.as_ref().map(|p| p.frame(&f)));
+                    if let Some(frame) = frame {
+                        let _ = channel.send(UiMessage::Frame(frame));
+                    }
                 }
-            }
-            EngineEvent::NoteEnded(_) => {}
-            EngineEvent::Error { error } => {
-                let message = error.to_string();
-                let _ = tx.send(UiMessage::Error { error, message });
-            }
-        })?;
-        let info = engine.info().clone();
-        *self.running.lock().expect("audio lock") = Some(Running {
-            engine,
-            mode,
-            channel,
-        });
+                EngineEvent::NoteEnded(_) => {}
+                EngineEvent::Error { error } => {
+                    let message = error.to_string();
+                    let _ = channel.send(UiMessage::Error { error, message });
+                }
+            })?;
+        *self.mode.lock().expect("mode lock") = Some(mode);
         Ok(info)
     }
 
-    /// Stop the engine if running.
+    /// Stop if running.
     pub fn stop(&self) {
-        let running = self.running.lock().expect("audio lock").take();
-        if let Some(r) = running {
-            r.engine.stop();
-        }
+        self.session.stop();
+        *self.mode.lock().expect("mode lock") = None;
     }
 
-    /// Apply new settings to a running engine. Returns `true` if the stream
-    /// had to be restarted (device or analysis parameters changed).
-    pub fn apply(&self, old: &Settings, new: &Settings) -> Result<bool, EngineError> {
-        self.set_presentation(new);
-        if old.needs_restart(new) {
-            let restart = self
-                .running
-                .lock()
-                .expect("audio lock")
-                .as_ref()
-                .map(|r| (r.mode, r.channel.clone()));
-            if let Some((mode, channel)) = restart {
-                self.start(mode, new, channel)?;
-                return Ok(true);
-            }
-            return Ok(false);
+    /// Apply new settings to a running stream (live or by restarting).
+    pub fn apply(&self, settings: &Settings) -> Result<(), EngineError> {
+        self.set_presentation(settings);
+        let mode = *self.mode.lock().expect("mode lock");
+        if let Some(mode) = mode {
+            self.session.reconfigure(engine_config(mode, settings))?;
         }
-        if let Some(r) = self.running.lock().expect("audio lock").as_ref() {
-            r.engine.set_context(new.pitch_context());
-            r.engine.set_tracker_config(new.tracker_config());
-        }
-        Ok(false)
+        Ok(())
     }
 
-    /// Stream facts and counters, if running.
+    /// Stream facts, counters and mode while running.
     pub fn status(&self) -> Option<(StreamInfo, EngineStats, SourceMode)> {
-        self.running
-            .lock()
-            .expect("audio lock")
-            .as_ref()
-            .map(|r| (r.engine.info().clone(), r.engine.stats(), r.mode))
+        let mode = (*self.mode.lock().expect("mode lock"))?;
+        self.session.status().map(|(i, s)| (i, s, mode))
     }
 
     fn set_presentation(&self, settings: &Settings) {

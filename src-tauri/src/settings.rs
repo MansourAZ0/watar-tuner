@@ -191,13 +191,6 @@ impl Settings {
         p
     }
 
-    /// `true` if switching from `self` to `next` needs a stream restart
-    /// (device or analysis parameters changed).
-    pub fn needs_restart(&self, next: &Settings) -> bool {
-        self.input_device_id != next.input_device_id
-            || self.sensitivity.silence_threshold_db != next.sensitivity.silence_threshold_db
-    }
-
     /// Load from `path`; a missing file gives defaults. A corrupt file is
     /// reported so it is not silently overwritten.
     pub fn load(path: &Path) -> io::Result<Settings> {
@@ -312,15 +305,5 @@ mod tests {
         fs::write(&path, "{ not json").unwrap();
         assert!(Settings::load(&path).is_err());
         let _ = fs::remove_dir_all(&dir);
-    }
-
-    #[test]
-    fn restart_needed_only_for_stream_parameters() {
-        let a = Settings::default();
-        let mut b = a.clone();
-        b.transposition = Transposition::new(-1.0, IntervalUnit::Semitone);
-        assert!(!a.needs_restart(&b));
-        b.input_device_id = Some("x".into());
-        assert!(a.needs_restart(&b));
     }
 }

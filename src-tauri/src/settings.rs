@@ -267,11 +267,18 @@ mod tests {
             ..Settings::default()
         };
         assert!(s.validate().is_err());
-        let mut s = Settings::default();
-        s.sensitivity.min_confidence = 0.1;
+        let s = Settings {
+            sensitivity: Sensitivity {
+                min_confidence: 0.1,
+                ..Sensitivity::default()
+            },
+            ..Settings::default()
+        };
         assert!(s.validate().is_err());
-        let mut s = Settings::default();
-        s.transposition = Transposition::new(-30.0, IntervalUnit::Semitone);
+        let s = Settings {
+            transposition: Transposition::new(-30.0, IntervalUnit::Semitone),
+            ..Settings::default()
+        };
         assert!(s.validate().is_err());
     }
 

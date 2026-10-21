@@ -25,3 +25,4 @@ dist-ssr
 
 # Local cargo overrides ([patch] to sibling checkouts)
 /.cargo/config.toml
+/release-local

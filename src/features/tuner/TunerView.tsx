@@ -80,13 +80,15 @@ export function TunerView({
     <div className="tuner">
       <div className="tuner-badges">
         <span className="badge" title={t("transposition")}>
-          {t("transposition")}: <strong>{transpositionText}</strong>
+          {t("transposition")}: <strong className="ltr">{transpositionText}</strong>
         </span>
         <span className="badge">
-          {t("tuning")}: <strong>{settings.tuning === "edo24" ? "24-EDO" : "12-EDO"}</strong>
+          {t("tuning")}: <strong className="ltr">{settings.tuning === "edo24" ? "24-EDO" : "12-EDO"}</strong>
         </span>
         <span className="badge">
-          La4 = <strong>{settings.referenceHz} Hz</strong>
+          <span className="ltr">
+            La4 = <strong>{settings.referenceHz} Hz</strong>
+          </span>
         </span>
         <div className="segmented" role="group" aria-label={t("defaultView")}>
           {(["player", "concert"] as const).map((v) => (
@@ -125,7 +127,7 @@ export function TunerView({
       <div className="meter-wrap">
         <CentsMeter flatLabel={t("flat")} sharpLabel={t("sharp")} />
         <div className={`cents-readout zone-${zone ?? "none"}`}>
-          {readout.cents === null ? "–" : formatCents(readout.cents)}
+          <span className="ltr">{readout.cents === null ? "–" : formatCents(readout.cents)}</span>
           <span className="unit">{t("cents")}</span>
           {zone === "inTune" && <span className="in-tune-pill">{t("inTune")}</span>}
         </div>
@@ -134,11 +136,11 @@ export function TunerView({
       <div className="readouts">
         <div>
           <span className="readout-label">{t("frequency")}</span>
-          <span className="readout-value">{readout.hz === null ? "–" : `${formatHz(readout.hz)} Hz`}</span>
+          <span className="readout-value ltr">{readout.hz === null ? "–" : `${formatHz(readout.hz)} Hz`}</span>
         </div>
         <div>
           <span className="readout-label">{t("target")}</span>
-          <span className="readout-value">
+          <span className="readout-value ltr">
             {readout.targetHz === null ? "–" : `${formatHz(readout.targetHz)} Hz`}
           </span>
         </div>
@@ -159,12 +161,12 @@ export function TunerView({
               return (
                 <div key={c.index} className={`course ${active ? "active" : ""}`}>
                   <NoteName label={c.label} style={settings.accidentalStyle} className="course-note" />
-                  <span className="course-hz">{formatHz(c.soundingHz)} Hz</span>
+                  <span className="course-hz ltr">{formatHz(c.soundingHz)} Hz</span>
                   <span className="course-strings" aria-hidden="true">
                     {"│".repeat(c.strings)}
                   </span>
                   {active && readout.courseCents !== null && (
-                    <span className={`course-cents zone-${tuningZone(readout.courseCents)}`}>
+                    <span className={`course-cents ltr zone-${tuningZone(readout.courseCents)}`}>
                       {formatCents(readout.courseCents)}
                     </span>
                   )}

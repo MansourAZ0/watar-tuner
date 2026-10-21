@@ -403,21 +403,20 @@ select:focus-visible {
 }
 
 .meter-wrap {
-  position: relative;
   width: min(640px, 92vw);
-  height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .cents-meter {
   width: 100%;
-  height: 100%;
+  height: 210px;
   display: block;
 }
 
 .cents-readout {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 34px;
+  margin-top: 4px;
   text-align: center;
   font-size: 34px;
   font-weight: 700;
@@ -735,4 +734,11 @@ select:focus-visible {
   * {
     transition: none !important;
   }
+}
+
+/* Numbers, units and technical tokens stay left-to-right inside RTL text. */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
 }

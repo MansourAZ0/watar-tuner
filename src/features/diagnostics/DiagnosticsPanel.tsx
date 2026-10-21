@@ -70,7 +70,7 @@ export function DiagnosticsPanel({ t }: { t: T }) {
         {rows.map(([k, v]) => (
           <div key={k}>
             <dt>{t(k)}</dt>
-            <dd>{v}</dd>
+            <dd className="ltr">{v}</dd>
           </div>
         ))}
       </dl>

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local cargo overrides ([patch] to sibling checkouts)
+/.cargo/config.toml

@@ -1,9 +1,12 @@
 [package]
 name = "watar-tuner"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Watar: a standalone quarter-tone oud tuner"
+authors = ["Mansour Aziz"]
 edition = "2024"
+rust-version = "1.90"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/MansourAZ0/watar-tuner"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -19,9 +22,13 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
-tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+naghma-core = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.1.0" }
+naghma-audio = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.1.0" }
+
+[dev-dependencies]
+pitchforge = { git = "https://github.com/MansourAZ0/pitchforge-rs", tag = "v0.1.0", features = ["signals"] }
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

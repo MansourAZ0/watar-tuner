@@ -1,0 +1,8 @@
+# Local development only (gitignored): build against sibling checkouts
+# instead of the tagged git dependencies.
+[patch."https://github.com/MansourAZ0/naghma-core"]
+naghma-core = { path = "../naghma-core/crates/naghma-core" }
+naghma-audio = { path = "../naghma-core/crates/naghma-audio" }
+
+[patch."https://github.com/MansourAZ0/pitchforge-rs"]
+pitchforge = { path = "../pitchforge-rs" }

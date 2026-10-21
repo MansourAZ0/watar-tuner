@@ -71,7 +71,7 @@ export default function App() {
     }
   }, []);
 
-  const start = async (mode: SourceMode) => {
+  const start = useCallback(async (mode: SourceMode) => {
     live.reset();
     setSession({ status: "starting", mode });
     try {
@@ -80,7 +80,14 @@ export default function App() {
     } catch (e) {
       setSession({ status: "error", error: asCommandError(e) });
     }
-  };
+  }, [onMessage]);
+
+  const autostarted = useRef(false);
+  useEffect(() => {
+    if (autostarted.current) return;
+    autostarted.current = true;
+    api.autostartMode().then((mode) => mode && start(mode)).catch(() => {});
+  }, [start]);
 
   const stop = async () => {
     await api.stopAudio().catch(() => {});
@@ -153,7 +160,7 @@ export default function App() {
           <span className="status-text">
             {running
               ? simulated
-                ? "SIMULATION"
+                ? t("simulationShort")
                 : `${t("listening")} · ${session.info.deviceName}`
               : session.status === "starting"
                 ? t("starting")

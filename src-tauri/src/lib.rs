@@ -82,6 +82,17 @@ struct InstrumentInfo {
     courses: Vec<CourseInfo>,
 }
 
+/// Development aid: `WATAR_AUTOSTART=simulation|microphone` starts audio on
+/// launch (used for automated screenshots and manual testing).
+#[tauri::command]
+fn autostart_mode() -> Option<SourceMode> {
+    match std::env::var("WATAR_AUTOSTART").ok()?.as_str() {
+        "simulation" => Some(SourceMode::Simulation),
+        "microphone" => Some(SourceMode::Microphone),
+        _ => None,
+    }
+}
+
 #[tauri::command]
 fn get_settings(state: State<'_, AppState>) -> Settings {
     state.settings.lock().expect("settings lock").clone()
@@ -206,6 +217,7 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            autostart_mode,
             get_settings,
             take_settings_warning,
             update_settings,

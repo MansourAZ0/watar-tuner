@@ -13,6 +13,7 @@ import type {
 } from "./types";
 
 export const api = {
+  autostartMode: () => invoke<SourceMode | null>("autostart_mode"),
   getSettings: () => invoke<Settings>("get_settings"),
   takeSettingsWarning: () => invoke<string | null>("take_settings_warning"),
   updateSettings: (settings: Settings) => invoke<Settings>("update_settings", { settings }),

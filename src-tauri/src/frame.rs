@@ -181,12 +181,13 @@ mod tests {
     use crate::settings::Settings;
     use naghma_audio::{AnalysisConfig, analyze_samples};
     use naghma_core::pitch::{IntervalUnit, Transposition};
+    use naghma_core::preferences::NotationPreferences;
     use pitchforge::signals;
 
     fn presentation(s: &Settings) -> Presentation {
         Presentation {
             labels: s.label_options(),
-            view: s.note_view,
+            view: s.notation.note_view,
             instrument: s.instrument(),
         }
     }
@@ -210,7 +211,10 @@ mod tests {
     #[test]
     fn player_view_shows_re4_for_sounding_do4_at_minus_two() {
         let s = Settings {
-            transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
+            notation: NotationPreferences {
+                transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         let last = frames_for(261.63, &s).pop().unwrap();
@@ -227,8 +231,11 @@ mod tests {
     #[test]
     fn concert_view_shows_sounding_note() {
         let s = Settings {
-            transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
-            note_view: NoteView::Concert,
+            notation: NotationPreferences {
+                transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
+                note_view: NoteView::Concert,
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         let note = frames_for(261.63, &s).pop().unwrap().note.unwrap();

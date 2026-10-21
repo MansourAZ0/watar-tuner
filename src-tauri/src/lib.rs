@@ -172,7 +172,7 @@ fn instrument_info(state: State<'_, AppState>) -> InstrumentInfo {
             let sounding_name = ctx
                 .read(sounding.to_frequency(profile.reference))
                 .map_or(c.open, |r| r.sounding.note);
-            let (label, other) = match s.note_view {
+            let (label, other) = match s.notation.note_view {
                 naghma_core::interpret::NoteView::Player => (c.open, sounding_name),
                 naghma_core::interpret::NoteView::Concert => (sounding_name, c.open),
             };

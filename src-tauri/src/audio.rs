@@ -111,7 +111,7 @@ impl AudioController {
     fn set_presentation(&self, settings: &Settings) {
         *self.presentation.write().expect("presentation lock") = Some(Presentation {
             labels: settings.label_options(),
-            view: settings.note_view,
+            view: settings.notation.note_view,
             instrument: settings.instrument(),
         });
     }

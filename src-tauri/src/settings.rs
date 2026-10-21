@@ -7,11 +7,10 @@
 
 use naghma_audio::AnalysisConfig;
 use naghma_core::instrument::InstrumentProfile;
-use naghma_core::interpret::{NoteView, PitchContext, Tuning};
-use naghma_core::notation::{AccidentalStyle, Digits, LabelOptions, Script};
-use naghma_core::pitch::{ReferencePitch, Transposition};
+use naghma_core::interpret::PitchContext;
+use naghma_core::notation::LabelOptions;
+use naghma_core::preferences::NotationPreferences;
 use naghma_core::tracking::TrackerConfig;
-use naghma_core::tuning::EqualTemperament;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io;
@@ -27,17 +26,6 @@ pub enum Language {
     #[default]
     En,
     Ar,
-}
-
-/// Tuning grid offered in the tuner.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum TuningChoice {
-    /// 24 equal divisions (quarter-tones).
-    #[default]
-    Edo24,
-    /// 12 equal divisions (semitones).
-    Edo12,
 }
 
 /// Rendering detail for the animated background.
@@ -75,13 +63,10 @@ impl Default for Sensitivity {
 pub struct Settings {
     pub version: u32,
     pub language: Language,
-    pub note_script: Script,
-    pub accidental_style: AccidentalStyle,
-    pub arabic_digits: bool,
-    pub note_view: NoteView,
-    pub reference_hz: f64,
-    pub transposition: Transposition,
-    pub tuning: TuningChoice,
+    /// Shared notation preferences, stored flat for compatibility with
+    /// settings written before they were factored out.
+    #[serde(flatten)]
+    pub notation: NotationPreferences,
     pub input_device_id: Option<String>,
     pub sensitivity: Sensitivity,
     pub visual_quality: VisualQuality,
@@ -93,13 +78,7 @@ impl Default for Settings {
         Self {
             version: SETTINGS_VERSION,
             language: Language::En,
-            note_script: Script::Latin,
-            accidental_style: AccidentalStyle::Symbol,
-            arabic_digits: false,
-            note_view: NoteView::Player,
-            reference_hz: 440.0,
-            transposition: Transposition::NONE,
-            tuning: TuningChoice::Edo24,
+            notation: NotationPreferences::default(),
             input_device_id: None,
             sensitivity: Sensitivity::default(),
             visual_quality: VisualQuality::Full,
@@ -122,13 +101,9 @@ impl Settings {
     /// Reject values that would break analysis or naming.
     pub fn validate(&self) -> Result<(), InvalidSettings> {
         let bad = |m: &str| Err(InvalidSettings(m.to_string()));
-        if !(self.reference_hz.is_finite() && (380.0..=480.0).contains(&self.reference_hz)) {
-            return bad("reference pitch must be between 380 and 480 Hz");
-        }
-        let t = self.transposition.interval().cents();
-        if !(t.is_finite() && t.abs() <= 2400.0) {
-            return bad("transposition must be within two octaves");
-        }
+        self.notation
+            .validate()
+            .map_err(|e| InvalidSettings(e.to_string()))?;
         let s = self.sensitivity;
         if !(s.silence_threshold_db.is_finite()
             && (-90.0..=-20.0).contains(&s.silence_threshold_db))
@@ -143,28 +118,12 @@ impl Settings {
 
     /// Naming context for the analysis engine.
     pub fn pitch_context(&self) -> PitchContext {
-        PitchContext {
-            reference: ReferencePitch::new(self.reference_hz).unwrap_or_default(),
-            transposition: self.transposition,
-            tuning: Tuning::Equal(match self.tuning {
-                TuningChoice::Edo24 => EqualTemperament::edo24(),
-                TuningChoice::Edo12 => EqualTemperament::edo12(),
-            }),
-        }
+        self.notation.pitch_context()
     }
 
     /// Label rendering options.
     pub fn label_options(&self) -> LabelOptions {
-        LabelOptions {
-            script: self.note_script,
-            accidentals: self.accidental_style,
-            show_octave: true,
-            digits: if self.arabic_digits {
-                Digits::ArabicIndic
-            } else {
-                Digits::Western
-            },
-        }
+        self.notation.label_options()
     }
 
     /// Analysis parameters (changing these requires restarting the stream).
@@ -186,8 +145,8 @@ impl Settings {
     /// The instrument with this reference and transposition applied.
     pub fn instrument(&self) -> InstrumentProfile {
         let mut p = InstrumentProfile::oud_6_course_example();
-        p.reference = ReferencePitch::new(self.reference_hz).unwrap_or_default();
-        p.transposition = self.transposition;
+        p.reference = self.notation.reference();
+        p.transposition = self.notation.transposition;
         p
     }
 
@@ -229,7 +188,24 @@ impl Settings {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use naghma_core::pitch::IntervalUnit;
+    use naghma_core::notation::Script;
+    use naghma_core::pitch::{IntervalUnit, Transposition};
+    use naghma_core::preferences::TuningChoice;
+
+    #[test]
+    fn json_stays_flat_for_compatibility() {
+        let v = serde_json::to_value(Settings::default()).unwrap();
+        for key in [
+            "referenceHz",
+            "transposition",
+            "tuning",
+            "noteScript",
+            "noteView",
+        ] {
+            assert!(v.get(key).is_some(), "{key}");
+        }
+        assert!(v.get("notation").is_none());
+    }
 
     #[test]
     fn defaults_are_valid_and_round_trip() {
@@ -246,17 +222,20 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            s.transposition,
+            s.notation.transposition,
             Transposition::new(-2.0, IntervalUnit::Semitone)
         );
-        assert_eq!(s.reference_hz, 440.0);
-        assert_eq!(s.tuning, TuningChoice::Edo24);
+        assert_eq!(s.notation.reference_hz, 440.0);
+        assert_eq!(s.notation.tuning, TuningChoice::Edo24);
     }
 
     #[test]
     fn validation_rejects_nonsense() {
         let s = Settings {
-            reference_hz: 1000.0,
+            notation: NotationPreferences {
+                reference_hz: 1000.0,
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         assert!(s.validate().is_err());
@@ -269,7 +248,10 @@ mod tests {
         };
         assert!(s.validate().is_err());
         let s = Settings {
-            transposition: Transposition::new(-30.0, IntervalUnit::Semitone),
+            notation: NotationPreferences {
+                transposition: Transposition::new(-30.0, IntervalUnit::Semitone),
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         assert!(s.validate().is_err());
@@ -278,15 +260,18 @@ mod tests {
     #[test]
     fn context_reflects_transposition_and_reference() {
         let s = Settings {
-            transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
-            reference_hz: 442.0,
+            notation: NotationPreferences {
+                transposition: Transposition::new(-2.0, IntervalUnit::Semitone),
+                reference_hz: 442.0,
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         let ctx = s.pitch_context();
         assert_eq!(ctx.reference.la4_hz, 442.0);
         let r = ctx.read(442.0 * 2f64.powf(-9.0 / 12.0)).unwrap(); // Do4 at 442
         assert_eq!(r.player.note.to_string(), "Re4");
-        assert_eq!(s.instrument().transposition, s.transposition);
+        assert_eq!(s.instrument().transposition, s.notation.transposition);
     }
 
     #[test]
@@ -297,7 +282,10 @@ mod tests {
         assert_eq!(Settings::load(&path).unwrap(), Settings::default());
         let s = Settings {
             language: Language::Ar,
-            note_script: Script::Arabic,
+            notation: NotationPreferences {
+                note_script: Script::Arabic,
+                ..NotationPreferences::default()
+            },
             ..Settings::default()
         };
         s.save(&path).unwrap();

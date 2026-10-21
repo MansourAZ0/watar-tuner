@@ -24,8 +24,8 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-naghma-core = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.2.0" }
-naghma-audio = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.2.0" }
+naghma-core = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.3.0" }
+naghma-audio = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.3.0" }
 
 [dev-dependencies]
 pitchforge = { git = "https://github.com/MansourAZ0/pitchforge-rs", tag = "v0.1.0", features = ["signals"] }

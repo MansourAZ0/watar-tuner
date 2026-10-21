@@ -1920,6 +1920,7 @@ dependencies = [
 [[package]]
 name = "naghma-audio"
 version = "0.1.0"
+source = "git+https://github.com/MansourAZ0/naghma-core?tag=v0.1.0#ec2745b8ad948e0afc3fcdb2bb00cc3a7c279645"
 dependencies = [
  "cpal",
  "naghma-core",
@@ -1931,6 +1932,7 @@ dependencies = [
 [[package]]
 name = "naghma-core"
 version = "0.1.0"
+source = "git+https://github.com/MansourAZ0/naghma-core?tag=v0.1.0#ec2745b8ad948e0afc3fcdb2bb00cc3a7c279645"
 dependencies = [
  "serde",
  "serde_json",
@@ -2414,6 +2416,7 @@ checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 [[package]]
 name = "pitchforge"
 version = "0.1.0"
+source = "git+https://github.com/MansourAZ0/pitchforge-rs?tag=v0.1.0#d59d6cc712d8a4b2a9d1cfe46cc0ed646231380a"
 dependencies = [
  "realfft",
 ]

@@ -11,12 +11,12 @@ env:
 
 jobs:
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
       - name: Fetch naghma-core (for @naghma/ui)
-        run: git clone --depth 1 --branch v0.2.0 "https://x-access-token:${{ secrets.DEPS_TOKEN || github.token }}@github.com/MansourAZ0/naghma-core" ../naghma-core
+        run: git clone --depth 1 --branch v0.2.0 "https://x-access-token:${{ secrets.DEPS_TOKEN || github.token }}@github.com/MansourAz0-org/naghma-core" ../naghma-core
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,7 +27,7 @@ jobs:
       - run: npx vite build
 
   rust:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
       # Library dependencies are private git repositories; DEPS_TOKEN needs

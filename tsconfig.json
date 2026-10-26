@@ -13,6 +13,13 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    /* @naghma/ui is compiled from a sibling naghma-core checkout that has no
+       node_modules of its own; resolve its React imports to this app's copy
+       (the TypeScript side of `resolve.dedupe` in vite.config.ts). */
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"]
+    },
 
     /* Linting */
     "strict": true,

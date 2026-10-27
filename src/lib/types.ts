@@ -7,7 +7,7 @@ import type { AccidentalStyle, NoteLabel, NoteView, Script, Transposition } from
 export type { AccidentalStyle, Degree, IntervalUnit, NoteLabel, NoteView, Script, Transposition } from "@naghma/ui";
 
 export type UiState = "silent" | "listening" | "note";
-export type ObservationStatus = "voiced" | "silence" | "aperiodic" | "outOfRange";
+export type ObservationStatus = "voiced" | "silence" | "aperiodic" | "outOfRange" | "invalidInput";
 
 export interface CourseMatch {
   index: number;

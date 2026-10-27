@@ -26,3 +26,22 @@ dist-ssr
 # Local cargo overrides ([patch] to sibling checkouts)
 /.cargo/config.toml
 /release-local
+
+# Credentials, signing material and private local data
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+*.keystore
+*.jks
+*.log
+/.cargo/config.toml
+/local-data/
+/recordings/
+/calibration*.json
+/settings.local.json
+/release-source/

@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   CARGO_NET_GIT_FETCH_WITH_CLI: "true"
@@ -14,26 +17,35 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
+      - name: Authenticate dependencies while repositories are private
+        if: github.event.repository.private
+        env:
+          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
+        run: git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
-      - name: Fetch naghma-core (for @naghma/ui)
-        run: git clone --depth 1 --branch v0.2.0 "https://x-access-token:${{ secrets.DEPS_TOKEN || github.token }}@github.com/MansourAz0-org/naghma-core" ../naghma-core
+      - name: Fetch shared UI at its release tag
+        run: git clone --depth 1 --branch v0.3.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
+      - name: Install shared UI dependencies
+        run: npm ci --prefix ../naghma-core/packages/naghma-ui
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
-      - run: npx vite build
+      - run: npm audit --audit-level=high
+      - run: npm run build
 
   rust:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v4
-      # Library dependencies are private git repositories; DEPS_TOKEN needs
-      # read access to them.
-      - name: Authenticate git dependencies
-        run: git config --global url."https://x-access-token:${{ secrets.DEPS_TOKEN || github.token }}@github.com/".insteadOf "https://github.com/"
+      - name: Authenticate dependencies while repositories are private
+        if: github.event.repository.private
+        env:
+          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
+        run: git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       - name: System dependencies
         run: |
           sudo apt-get update

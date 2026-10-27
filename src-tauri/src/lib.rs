@@ -86,6 +86,9 @@ struct InstrumentInfo {
 /// launch (used for automated screenshots and manual testing).
 #[tauri::command]
 fn autostart_mode() -> Option<SourceMode> {
+    if !cfg!(debug_assertions) {
+        return None;
+    }
     match std::env::var("WATAR_AUTOSTART").ok()?.as_str() {
         "simulation" => Some(SourceMode::Simulation),
         "microphone" => Some(SourceMode::Microphone),

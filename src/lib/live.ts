@@ -22,6 +22,15 @@ export class WatarStore extends LiveStore<UiFrame> {
       this.pendingStarts.push(frame.started);
       if (this.pendingStarts.length > 8) this.pendingStarts.shift();
     }
+    const revised = frame.revised;
+    if (revised) {
+      const replace = (list: UiNoteStart[]) => {
+        const i = list.findIndex((s) => s.eventId === revised.eventId);
+        if (i >= 0) list[i] = revised;
+      };
+      replace(this.history);
+      replace(this.pendingStarts);
+    }
   }
 
   protected onReset(): void {
@@ -40,6 +49,7 @@ export const EMPTY_FRAME: UiFrame = {
   onset: false,
   note: null,
   started: null,
+  revised: null,
   diagnostics: { rawHz: null, computeUs: 0, latencyMs: null, windowMs: 0 },
 };
 

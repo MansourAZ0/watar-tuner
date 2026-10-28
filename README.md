@@ -31,10 +31,10 @@ Install current stable Rust (the app declares 1.90+), Node 24+, and the
 Linux also needs ALSA development headers.
 
 The shared UI comes from a sibling `naghma-core` checkout. Clone these into the
-same parent folder; use `v0.3.0` for Watar's current dependency contract:
+same parent folder; use `v0.6.0` for Watar's current dependency contract:
 
 ```sh
-git clone --branch v0.3.0 https://github.com/MansourAZ0/naghma-core.git
+git clone --branch v0.6.0 https://github.com/MansourAZ0/naghma-core.git
 git clone https://github.com/MansourAZ0/watar-tuner.git
 cd watar-tuner
 npm ci --prefix ../naghma-core/packages/naghma-ui
@@ -71,8 +71,8 @@ not while you tune. See [security and privacy](SECURITY.md).
 | **watar-tuner** | The standalone tuner. This repository. |
 | [Ajnas](https://github.com/MansourAZ0/Ajnas) | Practice, maqam teaching and optional camera support. |
 
-Watar uses tagged `naghma-core`/`naghma-audio` **v0.3.0** and `pitchforge`
-**v0.1.0**, recorded in `src-tauri/Cargo.lock`. It does not depend on Ajnas.
+Watar uses tagged `naghma-core`/`naghma-audio` **v0.6.0** and `pitchforge`
+**v0.1.1**, recorded in `src-tauri/Cargo.lock`. It does not depend on Ajnas.
 New fixes in those libraries require new dependency tags before reaching Watar.
 
 ## Limits

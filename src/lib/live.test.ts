@@ -35,4 +35,19 @@ describe("WatarStore", () => {
     expect(s.history).toHaveLength(0);
     expect(s.pendingOnsets).toBe(0);
   });
+
+  it("renames a recent start when its pluck settles", () => {
+    const s = new WatarStore();
+    s.push({ ...EMPTY_FRAME, t: 0, started: start(1) });
+    s.push({ ...EMPTY_FRAME, t: 1, started: start(2) });
+    const renamed = { ...start(1), label: { ...start(1).label, text: "Mi4" }, pitch: 64 };
+    s.push({ ...EMPTY_FRAME, t: 2, revised: renamed });
+    expect(s.history.map((h) => h.label.text)).toEqual(["Mi4", "Re4"]);
+    expect(s.history[0].pitch).toBe(64);
+    expect(s.history).toHaveLength(2);
+    expect(s.pendingStarts[0].label.text).toBe("Mi4");
+    // An unknown id changes nothing.
+    s.push({ ...EMPTY_FRAME, t: 3, revised: start(99) });
+    expect(s.history).toHaveLength(2);
+  });
 });

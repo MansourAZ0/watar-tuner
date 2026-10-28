@@ -49,6 +49,8 @@ export interface UiFrame {
   onset: boolean;
   note: UiNote | null;
   started: UiNoteStart | null;
+  /** A recent start renamed while its pluck settled (same eventId). */
+  revised: UiNoteStart | null;
   diagnostics: UiDiagnostics;
 }
 

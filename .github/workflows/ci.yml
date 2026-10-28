@@ -24,7 +24,7 @@ jobs:
         run: git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
       - name: Fetch shared UI at its release tag
-        run: git clone --depth 1 --branch v0.3.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
+        run: git clone --depth 1 --branch v0.6.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
       - uses: actions/setup-node@v4
         with:
           node-version: 24

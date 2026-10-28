@@ -42,12 +42,12 @@ Evidence: [audio integration](../src-tauri/src/audio.rs),
 - RustSec also flags the transitive `proc-macro-error` 1.0.4 as unmaintained.
   These warnings remain visible, not suppressed. No application exploit or
   reachability of the affected GLib method was established in this audit.
-- Existing naghma v0.3.0 and pitchforge v0.1.0 tags do not contain the new library
-  safety fixes. Release new tags and update the app, lockfile and CI together.
-- AudioController/EngineSession lifecycle concurrency and settings failure
-  reconciliation need dedicated integration testing. Source startup occurs
-  outside EngineSession's state lock; the app's mode/presentation/settings use
-  separate locks. This is a review concern, not a reproduced failure here.
+- ~~Old library tags~~ — the app now uses naghma v0.6.0 and pitchforge v0.1.1,
+  which contain the library safety fixes (the tags must be published first).
+- EngineSession lifecycle: fixed in naghma v0.6.0 (a stop during a slow start
+  left the microphone running; reproduced and covered by library tests). The
+  app ignores the replaced start's `superseded` error. Settings failure
+  reconciliation across the app's separate locks still needs integration tests.
 - Frontend coverage is sparse: 3 tests do not validate full user flows. Add
   start/stop, denied-permission, device-removal, stale-frame and RTL interaction
   tests. Check keyboard use, screen readers and reduced-motion behaviour.

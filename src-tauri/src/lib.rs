@@ -160,6 +160,12 @@ fn audio_status(state: State<'_, AppState>) -> Option<AudioStatus> {
         .map(|(info, stats, mode)| AudioStatus { info, stats, mode })
 }
 
+/// Courses of the example tuning, the starting point for editing.
+#[tauri::command]
+fn example_courses() -> Vec<naghma_core::instrument::Course> {
+    naghma_core::instrument::InstrumentProfile::oud_6_course_example().courses
+}
+
 #[tauri::command]
 fn instrument_info(state: State<'_, AppState>) -> InstrumentInfo {
     let s = state.settings.lock().expect("settings lock").clone();
@@ -228,6 +234,7 @@ pub fn run() {
             stop_audio,
             audio_status,
             instrument_info,
+            example_courses,
         ])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Destroyed = event {

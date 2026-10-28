@@ -113,6 +113,14 @@ export type Language = "en" | "ar";
 export type TuningChoice = "edo24" | "edo12";
 export type VisualQuality = "full" | "reduced" | "off";
 
+/** An open course; `open` is a note in the player's notation, such as
+ * "Do2" or "Mi half-flat 3". */
+export interface Course {
+  open: string;
+  strings: number;
+  adjustmentCents: number;
+}
+
 export interface Settings {
   version: number;
   language: Language;
@@ -127,6 +135,8 @@ export interface Settings {
   sensitivity: { silenceThresholdDb: number; minConfidence: number };
   visualQuality: VisualQuality;
   showDiagnostics: boolean;
+  /** Empty = the example tuning. */
+  courses: Course[];
 }
 
 export interface CommandError {

@@ -38,7 +38,8 @@ _Last updated: 2026-10-21_
 - Single monophonic note assumed; strings left ringing can dominate.
 - Windows that straddle a note change can report an in-between pitch; the
   tracker suppresses most of these but very fast passages may lag.
-- Only the example 6-course oud profile; course editing UI not built yet.
+- Open courses are editable (Settings → Instrument); scale and fingerboard
+  lengths still come from the example profile.
 - Custom intonation profiles exist in `naghma-core` but are not selectable
   in the UI yet (24/12-EDO only).
 - Musical terminology choices listed in naghma-core `docs/PROVISIONAL.md`
@@ -48,6 +49,6 @@ _Last updated: 2026-10-21_
 
 1. Manual microphone test of the bundled app; record oud samples and run
    `analyze_wav`; tune tracker defaults from real data.
-2. Instrument profile editor (courses, scale length, per-course cents).
+2. ~~Course editor~~ (done); scale-length editing.
 3. Intonation-profile selection once validated profiles exist.
 4. Windows build.

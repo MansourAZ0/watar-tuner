@@ -4,6 +4,7 @@ import { Channel, invoke } from "@tauri-apps/api/core";
 import type {
   AudioStatus,
   CommandError,
+  Course,
   InputDevice,
   InstrumentInfo,
   Settings,
@@ -20,6 +21,7 @@ export const api = {
   listInputDevices: () => invoke<InputDevice[]>("list_input_devices"),
   audioStatus: () => invoke<AudioStatus | null>("audio_status"),
   instrumentInfo: () => invoke<InstrumentInfo>("instrument_info"),
+  exampleCourses: () => invoke<Course[]>("example_courses"),
   stopAudio: () => invoke<void>("stop_audio"),
   startAudio: (mode: SourceMode, onMessage: (m: UiMessage) => void) => {
     const channel = new Channel<UiMessage>();

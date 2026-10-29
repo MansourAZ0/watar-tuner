@@ -87,6 +87,9 @@ pub struct UiFrame {
     pub onset: bool,
     pub note: Option<UiNote>,
     pub started: Option<UiNoteStart>,
+    /// A note that started shortly before, renamed while its pluck settled
+    /// (same `event_id` as its start).
+    pub revised: Option<UiNoteStart>,
     pub diagnostics: UiDiagnostics,
 }
 
@@ -133,7 +136,7 @@ impl Presentation {
                 )
             }
         };
-        let started = f.update.started.as_ref().map(|e| {
+        let note_start = |e: &naghma_core::events::MusicalNoteEvent| {
             let m = match self.view {
                 NoteView::Player => &e.player,
                 NoteView::Concert => &e.sounding,
@@ -145,7 +148,9 @@ impl Presentation {
                 start_s: e.start_s,
                 pitch: e.player_pitch.0,
             }
-        });
+        };
+        let started = f.update.started.as_ref().map(note_start);
+        let revised = f.update.revised.as_ref().map(note_start);
         UiFrame {
             t: f.observation.time_s,
             state,
@@ -155,6 +160,7 @@ impl Presentation {
             onset: f.update.onset,
             note,
             started,
+            revised,
             diagnostics: UiDiagnostics {
                 raw_hz: f.observation.frequency_hz,
                 compute_us: f.timing.compute_us,

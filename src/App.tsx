@@ -78,7 +78,10 @@ export default function App() {
       const info = await api.startAudio(mode, onMessage);
       setSession({ status: "running", mode, info });
     } catch (e) {
-      setSession({ status: "error", error: asCommandError(e) });
+      const error = asCommandError(e);
+      // A later start or stop replaced this one; that call owns the session.
+      if (error.code === "superseded") return;
+      setSession({ status: "error", error });
     }
   }, [onMessage]);
 

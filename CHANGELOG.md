@@ -22,5 +22,8 @@
 - Use anonymous public dependency fetching and read-only workflow permissions.
 
 ### Added
+- Settings → Instrument: edit the open courses (note, number of strings,
+  fine adjustment in cents; up to 8 courses), or go back to the example
+  tuning. The tuner's course targets follow your tuning.
 - Accessible README, credits, privacy/contribution/release guides, audit, source
   exporter, secret/dependency checks and dependency update configuration.

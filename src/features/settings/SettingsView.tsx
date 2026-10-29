@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
+import { CoursesEditor } from "./CoursesEditor";
 import type { StringKey } from "../../lib/i18n";
 import type { InputDevice, IntervalUnit, Settings } from "../../lib/types";
 
@@ -144,6 +145,13 @@ export function SettingsView({
           />
         </label>
         <p className="help">{t("referenceHelp")}</p>
+
+        <CoursesEditor
+          t={t}
+          courses={settings.courses}
+          script={settings.noteScript}
+          onChange={(courses) => set("courses", courses)}
+        />
 
         <label className="field">
           <span>{t("tuningGrid")}</span>

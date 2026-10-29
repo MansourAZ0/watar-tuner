@@ -6,7 +6,7 @@
 //! load, and unknown fields from newer versions are ignored.
 
 use naghma_audio::AnalysisConfig;
-use naghma_core::instrument::InstrumentProfile;
+use naghma_core::instrument::{Course, InstrumentProfile};
 use naghma_core::interpret::PitchContext;
 use naghma_core::notation::LabelOptions;
 use naghma_core::preferences::NotationPreferences;
@@ -71,6 +71,9 @@ pub struct Settings {
     pub sensitivity: Sensitivity,
     pub visual_quality: VisualQuality,
     pub show_diagnostics: bool,
+    /// Open courses, lowest first, in the player's notation. Empty means
+    /// the example tuning Do2 Fa2 La2 Re3 Sol3 Do4.
+    pub courses: Vec<Course>,
 }
 
 impl Default for Settings {
@@ -83,9 +86,15 @@ impl Default for Settings {
             sensitivity: Sensitivity::default(),
             visual_quality: VisualQuality::Full,
             show_diagnostics: false,
+            courses: Vec::new(),
         }
     }
 }
+
+/// Most courses accepted in [`Settings::courses`].
+pub const MAX_COURSES: usize = 8;
+/// Accepted open-course pitches (Do1 to Do6, semitones from Do−1).
+const OPEN_RANGE: (f64, f64) = (24.0, 84.0);
 
 /// A settings value that cannot be used.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -112,6 +121,20 @@ impl Settings {
         }
         if !(s.min_confidence.is_finite() && (0.5..=0.99).contains(&s.min_confidence)) {
             return bad("minimum confidence must be between 0.5 and 0.99");
+        }
+        if self.courses.len() > MAX_COURSES {
+            return bad("an oud has at most 8 courses here");
+        }
+        for c in &self.courses {
+            if !(1..=3).contains(&c.strings) {
+                return bad("a course has 1 to 3 strings");
+            }
+            if !(c.adjustment_cents.is_finite() && c.adjustment_cents.abs() <= 50.0) {
+                return bad("a course's fine adjustment must be within ±50 cents");
+            }
+            if !(OPEN_RANGE.0..=OPEN_RANGE.1).contains(&c.open.nominal_pitch().0) {
+                return bad("open courses must lie between Do1 and Do6");
+            }
         }
         Ok(())
     }
@@ -145,6 +168,12 @@ impl Settings {
     /// The instrument with this reference and transposition applied.
     pub fn instrument(&self) -> InstrumentProfile {
         let mut p = InstrumentProfile::oud_6_course_example();
+        if !self.courses.is_empty() {
+            p.id = "custom".into();
+            p.name = "Your oud".into();
+            p.description = None;
+            p.courses = self.courses.clone();
+        }
         p.reference = self.notation.reference();
         p.transposition = self.notation.transposition;
         p
@@ -293,5 +322,53 @@ mod tests {
         fs::write(&path, "{ not json").unwrap();
         assert!(Settings::load(&path).is_err());
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn custom_courses_replace_the_example_tuning() {
+        let mut s = Settings::default();
+        assert_eq!(s.instrument().courses.len(), 6);
+        s.courses = serde_json::from_str(
+            r#"[{"open":"Re2","strings":1},{"open":"Sol2","strings":2},
+                {"open":"La2","strings":2},{"open":"Re3","strings":2},
+                {"open":"Sol3","strings":2},{"open":"Do4","strings":2},
+                {"open":"Fa4","strings":2,"adjustmentCents":-4}]"#,
+        )
+        .unwrap();
+        s.validate().unwrap();
+        let p = s.instrument();
+        assert_eq!(p.courses.len(), 7);
+        assert_eq!(p.courses[0].open.to_string(), "Re2");
+        assert_eq!(p.courses[6].adjustment_cents, -4.0);
+        assert_eq!(p.id, "custom");
+        let json = serde_json::to_string(&s).unwrap();
+        assert_eq!(serde_json::from_str::<Settings>(&json).unwrap(), s);
+    }
+
+    #[test]
+    fn unplayable_courses_are_rejected() {
+        let course = |json: &str| -> Settings {
+            Settings {
+                courses: vec![serde_json::from_str(json).unwrap()],
+                ..Settings::default()
+            }
+        };
+        assert!(course(r#"{"open":"Do0","strings":1}"#).validate().is_err());
+        assert!(course(r#"{"open":"Do2","strings":4}"#).validate().is_err());
+        assert!(
+            course(r#"{"open":"Do2","adjustmentCents":80}"#)
+                .validate()
+                .is_err()
+        );
+        assert!(
+            course(r#"{"open":"Mi half-flat 3","strings":2}"#)
+                .validate()
+                .is_ok()
+        );
+        let many = Settings {
+            courses: vec![serde_json::from_str(r#"{"open":"Do3"}"#).unwrap(); 9],
+            ..Settings::default()
+        };
+        assert!(many.validate().is_err());
     }
 }

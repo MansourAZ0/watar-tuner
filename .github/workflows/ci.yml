@@ -20,8 +20,14 @@ jobs:
       - name: Authenticate dependencies while repositories are private
         if: github.event.repository.private
         env:
-          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
-        run: git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
+          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -z "$DEPS_TOKEN" ]]; then
+            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets; see .github/DEPENDENCY_ACCESS.md."
+            exit 1
+          fi
+          git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
       - name: Fetch shared UI at its release tag
         run: git clone --depth 1 --branch v0.6.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
@@ -44,8 +50,14 @@ jobs:
       - name: Authenticate dependencies while repositories are private
         if: github.event.repository.private
         env:
-          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN || github.token }}
-        run: git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
+          DEPS_TOKEN: ${{ secrets.DEPS_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -z "$DEPS_TOKEN" ]]; then
+            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets; see .github/DEPENDENCY_ACCESS.md."
+            exit 1
+          fi
+          git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       - name: System dependencies
         run: |
           sudo apt-get update

@@ -31,7 +31,7 @@ jobs:
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
       - name: Fetch shared UI at its release tag
         run: git clone --depth 1 --branch v0.6.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm

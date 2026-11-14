@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$DEPS_TOKEN" ]]; then
-            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets; see .github/DEPENDENCY_ACCESS.md."
+            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets, or make the dependency repositories public."
             exit 1
           fi
           git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$DEPS_TOKEN" ]]; then
-            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets; see .github/DEPENDENCY_ACCESS.md."
+            echo "::error::DEPS_TOKEN is required to read the private music dependencies. Configure it in both Actions and Dependabot secrets, or make the dependency repositories public."
             exit 1
           fi
           git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"

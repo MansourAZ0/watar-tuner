@@ -82,9 +82,6 @@ changes and harmonics can confuse the detector. Confidence is a measure of
 periodicity, not a guarantee that the note is right. A quarter-tone grid is a
 useful reference; it does not describe every maqam's performance intonation.
 
-See [progress and existing validation](docs/PROGRESS.md) and the
-[current audit](docs/AUDIT.md).
-
 ## Development
 
 ```sh
@@ -110,5 +107,4 @@ solfège, transposition and oud targets come from this ecosystem's `naghma-core`
 Watar presents them as a tuner. See [credits](CREDITS.md).
 
 Project code: [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your option.
-See [third-party notices](THIRD_PARTY_NOTICES.md) and the
-[open-source release guide](docs/OPEN_SOURCE.md).
+See [third-party notices](THIRD_PARTY_NOTICES.md).

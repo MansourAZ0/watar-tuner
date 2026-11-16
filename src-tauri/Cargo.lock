@@ -1923,7 +1923,7 @@ version = "0.6.0"
 source = "git+https://github.com/MansourAz0-org/naghma-core?tag=v0.6.0#eb53bcae8b0e4229d39dc69683f5e3a455b749ee"
 dependencies = [
  "cpal",
- "naghma-core",
+ "naghma-core 0.6.0",
  "pitchforge",
  "rtrb",
  "serde",
@@ -1933,6 +1933,15 @@ dependencies = [
 name = "naghma-core"
 version = "0.6.0"
 source = "git+https://github.com/MansourAz0-org/naghma-core?tag=v0.6.0#eb53bcae8b0e4229d39dc69683f5e3a455b749ee"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "naghma-core"
+version = "0.8.0"
+source = "git+https://github.com/MansourAz0-org/naghma-core?tag=v0.8.0#eb92d12a06f8ac9b958a97ffc5e46b268c0f0543"
 dependencies = [
  "serde",
  "serde_json",
@@ -2034,7 +2043,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "680998035259dcfcafe653688bf2aa6d3e2dc05e98be6ab46afb089dc84f1df8"
 dependencies = [
- "proc-macro-crate 1.3.1",
+ "proc-macro-crate 2.0.2",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -4032,7 +4041,7 @@ name = "watar-tuner"
 version = "0.1.0"
 dependencies = [
  "naghma-audio",
- "naghma-core",
+ "naghma-core 0.8.0",
  "pitchforge",
  "serde",
  "serde_json",

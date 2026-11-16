@@ -6,7 +6,7 @@ authors = ["Mansour Aziz"]
 edition = "2024"
 rust-version = "1.90"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/MansourAZ0/watar-tuner"
+repository = "https://github.com/MansourAz0-org/watar-tuner"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -24,10 +24,12 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-naghma-core = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.6.0" }
-naghma-audio = { git = "https://github.com/MansourAZ0/naghma-core", tag = "v0.6.0" }
+naghma-core = { git = "https://github.com/MansourAz0-org/naghma-core", tag = "v0.6.0" }
+naghma-audio = { git = "https://github.com/MansourAz0-org/naghma-core", tag = "v0.6.0" }
 
 [dev-dependencies]
+# Same address the pinned naghma-core release uses, so Cargo sees one pitchforge.
+# GitHub redirects it to MansourAz0-org; switch it with the next naghma-core release.
 pitchforge = { git = "https://github.com/MansourAZ0/pitchforge-rs", tag = "v0.1.1", features = ["signals"] }
 
 

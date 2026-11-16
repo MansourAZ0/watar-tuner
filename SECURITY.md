@@ -2,7 +2,7 @@
 
 ## Report a vulnerability
 
-Use [GitHub private vulnerability reporting](https://github.com/MansourAZ0/watar-tuner/security/advisories/new)
+Use [GitHub private vulnerability reporting](https://github.com/MansourAz0-org/watar-tuner/security/advisories/new)
 if it is enabled. Include the affected revision, reproduction steps and impact.
 Do not put credentials, private recordings, personal file paths or device IDs in
 a public issue. If private reporting is unavailable, ask the maintainer to enable

@@ -14,7 +14,7 @@ env:
 
 jobs:
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v7
       - name: Authenticate dependencies while repositories are private
@@ -30,7 +30,7 @@ jobs:
           git config --global url."https://x-access-token:${DEPS_TOKEN}@github.com/".insteadOf "https://github.com/"
       # @naghma/ui is a path dependency on a sibling checkout of naghma-core.
       - name: Fetch shared UI at its release tag
-        run: git clone --depth 1 --branch v0.6.0 https://github.com/MansourAZ0/naghma-core.git ../naghma-core
+        run: git clone --depth 1 --branch v0.6.0 https://github.com/MansourAz0-org/naghma-core.git ../naghma-core
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -44,7 +44,7 @@ jobs:
       - run: npm run build
 
   rust:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v7
       - name: Authenticate dependencies while repositories are private

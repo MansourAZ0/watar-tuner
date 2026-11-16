@@ -30,7 +30,7 @@
   "description": "A standalone oud tuner with Arabic solfege, quarter-tones and player/concert pitch.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MansourAZ0/watar-tuner.git"
+    "url": "https://github.com/MansourAz0-org/watar-tuner.git"
   },
   "engines": {
     "node": ">=24"

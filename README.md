@@ -34,8 +34,8 @@ The shared UI comes from a sibling `naghma-core` checkout. Clone these into the
 same parent folder; use `v0.6.0` for Watar's current dependency contract:
 
 ```sh
-git clone --branch v0.6.0 https://github.com/MansourAZ0/naghma-core.git
-git clone https://github.com/MansourAZ0/watar-tuner.git
+git clone --branch v0.6.0 https://github.com/MansourAz0-org/naghma-core.git
+git clone https://github.com/MansourAz0-org/watar-tuner.git
 cd watar-tuner
 npm ci --prefix ../naghma-core/packages/naghma-ui
 npm ci
@@ -66,10 +66,10 @@ not while you tune. See [security and privacy](SECURITY.md).
 
 | Repository | Role |
 | --- | --- |
-| [pitchforge-rs](https://github.com/MansourAZ0/pitchforge-rs) | Finds frequency with YIN. |
-| [naghma-core](https://github.com/MansourAZ0/naghma-core) | Music theory, microphone pipeline and shared UI. |
+| [pitchforge-rs](https://github.com/MansourAz0-org/pitchforge-rs) | Finds frequency with YIN. |
+| [naghma-core](https://github.com/MansourAz0-org/naghma-core) | Music theory, microphone pipeline and shared UI. |
 | **watar-tuner** | The standalone tuner. This repository. |
-| [Ajnas](https://github.com/MansourAZ0/Ajnas) | Practice, maqam teaching and optional camera support. |
+| [Ajnas](https://github.com/MansourAz0-org/Ajnas) | Practice, maqam teaching and optional camera support. |
 
 Watar uses tagged `naghma-core`/`naghma-audio` **v0.6.0** and `pitchforge`
 **v0.1.1**, recorded in `src-tauri/Cargo.lock`. It does not depend on Ajnas.
